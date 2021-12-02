@@ -24,3 +24,30 @@ window.onload = () => {
     console.log('Success on upgrade indexedDB database!');
   }
 }
+
+const addData = (e) => {
+  e.preventDefault();
+
+  let transaction = database.transaction(['contacts'], 'readwrite');
+  let objectStore = transaction.objectStore('contacts');
+
+  let firstName = firstNameInput.value;
+  let lastName = lastNameInput.value;
+
+  let request = objectStore.add({ firstName, lastName });
+
+  request.onsuccess = () => {
+    firstNameInput.value = '';
+    lastNameInput.value = '';
+  }
+
+  request.oncomplete = () => {
+    console.log('Success on add data!');
+  }
+
+  request.onerror = () => {
+    console.log('Failed on add data!');
+  }
+}
+
+newContactForm.addEventListener('submit', addData);
