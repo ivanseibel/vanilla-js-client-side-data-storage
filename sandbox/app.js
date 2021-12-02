@@ -15,7 +15,7 @@ window.onload = () => {
 
   request.onsuccess = () => {
     database = request.result;
-    displayData();
+    displayContacts();
     console.log('Success on open indexedDB database!');
   }
 
@@ -42,7 +42,7 @@ const addData = (e) => {
   request.onsuccess = () => {
     firstNameInput.value = '';
     lastNameInput.value = '';
-    displayData();
+    displayContacts();
     console.log('Success on add data!');
   }
 
@@ -53,7 +53,24 @@ const addData = (e) => {
 
 newContactForm.addEventListener('submit', addData);
 
-const displayData = () => {
+const deleteContact = (id) => {
+  let transaction = database.transaction(['contacts'], 'readwrite');
+  let objectStore = transaction.objectStore('contacts');
+
+  let request = objectStore.delete(Number(id));
+
+  request.onsuccess = (e) => {
+    displayContacts();
+    console.log('Success on delete data!');
+  }
+
+  request.onerror = () => {
+    console.log('Failed on delete data!');
+  }
+
+}
+
+const displayContacts = () => {
   let transaction = database.transaction(['contacts'], 'readonly');
   let objectStore = transaction.objectStore('contacts');
   contactsList.innerHTML = '';
@@ -65,7 +82,21 @@ const displayData = () => {
 
     if (cursor) {
       let li = document.createElement('li');
-      li.innerHTML = `${cursor.value.firstName} ${cursor.value.lastName}`;
+      let contactName = document.createElement('span');
+      let deleteButton = document.createElement('button');
+
+      contactName.textContent = `${cursor.value.firstName} ${cursor.value.lastName}`;
+
+      deleteButton.setAttribute('data-contact-id', cursor.value.id);
+      deleteButton.className = 'deleteButton';
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', () => {
+        deleteContact(deleteButton.getAttribute('data-contact-id'));
+      });
+
+      li.appendChild(deleteButton);
+      li.appendChild(contactName);
+
       contactsList.appendChild(li);
 
       cursor.continue();
@@ -79,4 +110,4 @@ const displayData = () => {
   }
 }
 
-refreshContactsButton.addEventListener('click', displayData);
+refreshContactsButton.addEventListener('click', displayContacts);

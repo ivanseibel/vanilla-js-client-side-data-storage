@@ -22,3 +22,11 @@ h1 {
 ul {
   list-style-type: none;
 }
+
+li {
+  margin-bottom: 5px;
+}
+
+.deleteButton {
+  margin-right: 10px;
+}
